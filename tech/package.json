@@ -1,0 +1,11 @@
+{
+  "name": "tech",
+  "version": "0.0.1",
+  "description": "krtsato's tech blog",
+  "main": "index.ts",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "krtsato",
+  "license": "ISC"
+}
