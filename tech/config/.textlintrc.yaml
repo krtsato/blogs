@@ -3,5 +3,5 @@ rules:
     sentence-length: false
   prh:
     rulePaths:
-      - dict/smarthr-prh-basic.yml
-      - dict/smarthr-prh-tech-word.yml
+      - config/prh_basic.yaml
+      - config/prh_tech.yaml
