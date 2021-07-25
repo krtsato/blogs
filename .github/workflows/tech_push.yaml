@@ -5,7 +5,7 @@ on:
       - tech/**
     branches:
       - main
-      - develop
+      - dev
       - feature/*
       - fix/*
       - refactor/*
@@ -53,4 +53,4 @@ jobs:
         with:
           submodule: true
       - name: Lint Articles
-        run: npx textlint -f checkstyle articles/**/*.md | reviewdog -f=checkstyle -name=textlint -reporter=github-pr-review # TODO: config ファイル化
+        run: npx textlint -f checkstyle article/**/*.md | reviewdog -f=checkstyle -name=textlint -reporter=github-pr-review # TODO: config ファイル化

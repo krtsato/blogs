@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "rootDir": "../",
+    "baseUrl": "src",
+    "paths": {
+      "@comp/*": [
+        "component/*"
+      ],
+      "@cont/*": [
+        "container/*"
+      ],
+    },
+    "jsx": "react-jsx"
+  },
+}
