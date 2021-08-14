@@ -6,9 +6,11 @@ on:
     branches:
       - main
       - dev
+      - debug
       - feature/*
       - fix/*
       - refactor/*
+      - inspect
 
 defaults:
   run:
