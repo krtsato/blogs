@@ -1,7 +1,5 @@
 ## Summary <!-- markdownlint-disable first-line-h1 -->
 
-## Goal
-
-## Plan
+## Issue
 
 ## Reference

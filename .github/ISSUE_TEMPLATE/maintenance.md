@@ -5,7 +5,7 @@ labels: maintenance
 assignees: krtsato
 ---
 
-## Summary <!-- markdownlint-disable first-line-h1 -->s
+## Summary <!-- markdownlint-disable first-line-h1 -->
 
 ## Goal
 
