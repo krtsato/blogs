@@ -1,7 +1,0 @@
-rules:
-  preset-smarthr:
-    sentence-length: false
-  prh:
-    rulePaths:
-      - config/prh_basic.yaml
-      - config/prh_tech.yaml
