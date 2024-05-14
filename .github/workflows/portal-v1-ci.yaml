@@ -1,17 +1,17 @@
-name: Portal V1 CD
+name: Portal V1 CI
 
 on: 
-  push:
+  pull_request:
     branches:
       - main
     paths:
-      - .github/workflows/portal-v1-cd.yaml
+      - .github/workflows/portal-v1-ci.yaml
       - portal-v1/**
       - '!portal-v1/**.md'
 
 jobs:
-  deploy:
-    name: Deploy to Cloudflare Pages
+  ci:
+    name: CI
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -50,6 +50,22 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: portal-v1
           directory: build/client
-          branch: main
+          branch: ${{ github.ref }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           wranglerVersion: 3
+
+      - name: Attach Deployed URL
+        if: ${{ steps.deploy.conclusion == 'success' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sha = context.payload.pull_request?.head.sha ?? context.sha;
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              context: 'Cloudflare Pages',
+              description: 'Cloudflare Pages deployment',
+              state: 'success',
+              sha,
+              target_url: "${{ steps.deploy.outputs.url }}",
+            });
