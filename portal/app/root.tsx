@@ -1,14 +1,14 @@
-import { ReactNode } from "react";
+import { ReactNode } from "react"
 import {
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
-} from "@remix-run/react";
-import "./root.css";
-import { Nav } from "~/components/nav";
-import { Footer } from "~/components/footer";
+} from "@remix-run/react"
+import "~/styles/root.css"
+import { Nav } from "~/components/nav"
+import { Footer } from "~/components/footer"
 
 
 const Layout = (props: { children: ReactNode }) => (
@@ -21,7 +21,7 @@ const Layout = (props: { children: ReactNode }) => (
       </main>
       <Footer />
     </div>
-  );
+  )
 
 export default function App() {
   return (
@@ -40,5 +40,5 @@ export default function App() {
         <Scripts />
       </body>
     </html>
-  );
+  )
 }

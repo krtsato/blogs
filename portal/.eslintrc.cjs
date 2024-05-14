@@ -10,6 +10,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: "latest",
     sourceType: "module",
+    project: "./tsconfig.json",
     ecmaFeatures: {
       jsx: true,
     },
@@ -59,7 +60,7 @@ module.exports = {
         "import/internal-regex": "^~/",
         "import/resolver": {
           node: {
-            extensions: [".ts", ".tsx"],
+            extensions: [".ts", ".tsx", ".d.ts"],
           },
           typescript: {
             alwaysTryTypes: true,

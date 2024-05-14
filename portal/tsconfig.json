@@ -1,13 +1,12 @@
 {
   "include": [
-    "env.d.ts",
+    "app/types/*.d.ts",
     "**/*.ts",
     "**/*.tsx",
     "**/.server/**/*.ts",
     "**/.server/**/*.tsx",
     "**/.client/**/*.ts",
     "**/.client/**/*.tsx",
-    "postcss.config.cjs"
   ],
   "compilerOptions": {
     "lib": [

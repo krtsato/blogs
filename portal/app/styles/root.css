@@ -7,5 +7,5 @@ body {
 }
 
 a:not(nav a) {
-  @apply underline decoration-cyan-700 hover:decoration-cyan-900;
+  @apply underline decoration-blue-400 hover:decoration-blue-800;
 }

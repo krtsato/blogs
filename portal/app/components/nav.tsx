@@ -1,22 +1,22 @@
-import { NavLink } from "@remix-run/react";
-import { navLinkClass } from "~/containers/nav";
+import { NavLink } from "@remix-run/react"
+import { navLinkClass } from "~/containers/nav"
 
 export const Nav = () => (
   <nav>
     <ul className="flex gap-16 text-lg font-semibold">
       <li>
         <NavLink to="/" className={navLinkClass}>
-          home
+          Home
         </NavLink>
       </li>
       <li>
-        <NavLink to="/blog" className={navLinkClass}>
-          blog
+        <NavLink to="/tech" className={navLinkClass}>
+          Tech
         </NavLink>
       </li>
       <li>
         <NavLink to="/about" className={navLinkClass}>
-          about
+          About
         </NavLink>
       </li>
     </ul>

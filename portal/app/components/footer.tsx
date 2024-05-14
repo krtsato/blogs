@@ -4,4 +4,4 @@ export const Footer = () => (
       Built with{" "}<a href="https://github.com/krtsato/blogs/tree/main/portal">code on GitHub.</a>
     </span>
   </footer>
-);
+)
