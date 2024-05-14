@@ -32,7 +32,7 @@ jobs:
         with:
           node-version: latest
           cache: npm
-          cache-dependency-path: package-lock.json
+          cache-dependency-path: ${{ github.workspace }}/portal-v1/package-lock.json
       
       - id: install
         name: Install
