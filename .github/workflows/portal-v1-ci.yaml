@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory:  ${{ github.workspace }}/portal-v1
+        working-directory: ${{ github.workspace }}/portal-v1
     permissions:
       contents: read
       deployments: write
