@@ -9,14 +9,13 @@ on:
       - portal-v1/**
       - '!portal-v1/**.md'
 
-defaults:
-  run:
-    working-directory: portal-v1
-
 jobs:
   deploy:
     name: Deploy to Cloudflare Pages
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory:  ${{ github.workspace }}/portal-v1
     permissions:
       contents: read
       deployments: write
@@ -33,6 +32,7 @@ jobs:
         with:
           node-version: latest
           cache: npm
+          cache-dependency-path: package-lock.json
       
       - id: install
         name: Install
