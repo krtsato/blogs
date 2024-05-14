@@ -1,8 +1,7 @@
-import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { listTechPosts } from "~/.server/posts/tech"
 import { PostHeadline } from "~/components/posts/headline"
-import type { MetaFunction } from "@remix-run/cloudflare"
+import { type MetaFunction, json } from "@remix-run/cloudflare"
 import type { ListPostsQuery } from "~/types/posts"
 
 
