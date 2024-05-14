@@ -32,7 +32,7 @@ jobs:
         with:
           node-version: latest
           cache: npm
-          cache-dependency-path: ${{ github.workspace }}/portal-v1/package-lock.json
+          cache-dependency-path: portal-v1/package-lock.json
       
       - id: install
         name: Install
@@ -49,8 +49,8 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: portal-v1
+          workingDirectory: portal-v1
           directory: build/client
-          workingDirectory: ${{ github.workspace }}/portal-v1
           branch: ${{ github.ref }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           wranglerVersion: 3
