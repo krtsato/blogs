@@ -50,6 +50,7 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: portal-v1
           directory: build/client
+          workingDirectory: ${{ github.workspace }}/portal-v1
           branch: ${{ github.ref }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           wranglerVersion: 3
