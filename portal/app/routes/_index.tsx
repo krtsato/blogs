@@ -16,7 +16,7 @@ export const meta: MetaFunction = () => {
 }
 
 export const loader = async () => {
-  const query: ListPostsQuery = { isFeatured: true }
+  const query: ListPostsQuery = { isFeatured: true, slugPrefix: "tech" }
   const techPosts = await listTechPosts(query).catch((err) => {
     console.error(`failed to list posts: err = ${err.message}`)
     throw err

@@ -11,14 +11,16 @@ export const listTechPosts = async (query: ListPostsQuery = {}): Promise<PostMet
   const posts = Object.entries(modules).map(([file, post]) => {
     const id = file.replace("../../", "").replace(/\.mdx$/, "")
 
-    const slug = build.routes[id]?.path
-    if (slug === undefined) throw new Error(`No route for ${id}`)
+    const _slug = build.routes[id]?.path
+    if (_slug === undefined) throw new Error(`No route for ${id}`)
+    const slug = (query.slugPrefix) ? query.slugPrefix.concat("/", _slug) : _slug
+
     return {
       slug,
       frontmatter: post.frontmatter,
     }
-  }).filter((post) => (
-    query.isFeatured && !post.frontmatter.isFeatured) ? false : true
+  }).filter((post) =>
+    (query.isFeatured && !post.frontmatter.isFeatured) ? false : true
   )
 
   return sortBy(posts, (post) => post.frontmatter.publishAt, "desc")

@@ -16,4 +16,5 @@ export type PublishMeta = {
 
 export type ListPostsQuery = {
   isFeatured?: boolean
+  slugPrefix?: string
 }
