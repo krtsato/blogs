@@ -10,8 +10,8 @@ on:
       - '!portal-v1/**.md'
 
 jobs:
-  ci:
-    name: CI
+  deploy-dev:
+    name: Deploy Dev
     runs-on: ubuntu-latest
     defaults:
       run:
