@@ -31,7 +31,7 @@ export default function Index() {
     <div className="grid flex-1 gap-16 p-10 sm:grid-cols-2 sm:place-items-center">
       <div className="space-y-8">
         <div>
-          <h2 className="text-4xl font-bold">Sakurada.io</h2>
+          <h2 className="text-4xl font-bold">sakurada.io</h2>
           <p className="font-light text-gray-600">
             Portal site owned by Kei Sakurada.
           </p>
