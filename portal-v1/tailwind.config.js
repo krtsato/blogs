@@ -8,6 +8,7 @@ export default {
       typography: (theme) => ({
         DEFAULT: {
           css: {
+            maxWidth: '100%',
             code: {
               backgroundColor: theme('colors.slate.100'),
               borderRadius: theme('borderRadius.DEFAULT'),
