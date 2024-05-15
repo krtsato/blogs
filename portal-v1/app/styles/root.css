@@ -9,3 +9,7 @@ body {
 a:not(nav a) {
   @apply underline decoration-blue-400 hover:decoration-blue-800;
 }
+
+li li:nth-child(n) {
+  @apply text-xs;
+}

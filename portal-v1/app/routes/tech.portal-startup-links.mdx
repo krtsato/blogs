@@ -1,0 +1,66 @@
+---
+title: Portal Startup Links
+description: Useful links when building this portal site
+publishAt: 2024-01-01 00:00:00
+isFeatured: false
+---
+
+import { PostPublishMeta } from '../components/posts/headline.tsx';
+
+# {frontmatter.title}
+
+<PostPublishMeta publishAt={frontmatter.publishAt}/>
+
+## 概要
+
+本ポータルサイト初期構築に参考にさせていただいたリンク集です。
+
+## リンク集
+
+- 主要な公式ドキュメント
+  - [https://remix.run/docs/en/main/guides/vite](https://remix.run/docs/en/main/guides/vite)
+  - [https://developers.cloudflare.com/pages/framework-guides/deploy-a-remix-site](https://developers.cloudflare.com/pages/framework-guides/deploy-a-remix-site)
+- Node.js ランタイム ( local 環境 ) でリバースプロキシの設定値を取得する方法
+  - [https://remix.run/docs/en/main/guides/vite#bindings](https://remix.run/docs/en/main/guides/vite#bindings)
+  - [https://developers.cloudflare.com/workers/wrangler/api/#getplatformproxy](https://developers.cloudflare.com/workers/wrangler/api/#getplatformproxy)
+- local, Cloudflare 環境問わず load context を拡張する方法
+  - [https://remix.run/docs/en/main/guides/vite#augmenting-load-context](https://remix.run/docs/en/main/guides/vite#augmenting-load-context)
+- mdx の導入
+  - [https://remix.run/docs/en/main/guides/vite#add-mdx-plugin](https://remix.run/docs/en/main/guides/vite#add-mdx-plugin)
+  - [https://remix.run/docs/en/main/guides/vite#add-mdx-frontmatter-support](https://remix.run/docs/en/main/guides/vite#add-mdx-frontmatter-support)
+- mdx の機能
+  - [https://docs.astro.build/ja/guides/markdown-content/](https://docs.astro.build/ja/guides/markdown-content/)
+- TailwindCSS with PostCSS
+  - [https://tailwindcss.com/docs/installation/using-postcss](https://tailwindcss.com/docs/installation/using-postcss)
+- Remix の Routing
+  - [https://zenn.dev/heysya_onsya/articles/5aae742104b32a](https://zenn.dev/heysya_onsya/articles/5aae742104b32a)
+- Remix の全体観
+  - [https://qiita.com/FAL-coffee/items/ec5733904b8485b6d94d](https://qiita.com/FAL-coffee/items/ec5733904b8485b6d94d)
+- `*.d.ts` が読み込めない
+  - [https://blog.kubosho.com/entries/eslint-plugin-import-error-on-vitest-configuration-file](https://blog.kubosho.com/entries/eslint-plugin-import-error-on-vitest-configuration-file)
+- `import.meta.glob`
+  - [https://www.ey-office.com/blog_archive/2023/04/25/what-is-import-meta-glob/](https://www.ey-office.com/blog_archive/2023/04/25/what-is-import-meta-glob/)
+- Remix の `defer`
+  - [https://zenn.dev/osushi02/scraps/68e04f28009e57](https://zenn.dev/osushi02/scraps/68e04f28009e57)
+- try-catch でなく await-catch を使おう
+  - [https://rinrin.me/posts/await-catch/](https://rinrin.me/posts/await-catch/)
+- `@tailwindcss/typography` 使用時のインラインコードのバッククォートを除去する
+  - [https://osgsm.io/posts/tailwindcss-typography-remove-backticks](https://osgsm.io/posts/tailwindcss-typography-remove-backticks)
+- Remix Utils
+  - [https://remix.run/resources/remix-utils](https://remix.run/resources/remix-utils)
+- `Cloud not resolve “crypto”` のエラー
+  - [https://zenn.dev/link/comments/89de5ac477e238](https://zenn.dev/link/comments/89de5ac477e238)
+- SSL 証明書の種類
+  - [https://www.cloudflare.com/ja-jp/learning/ssl/types-of-ssl-certificates/](https://www.cloudflare.com/ja-jp/learning/ssl/types-of-ssl-certificates/)
+- Cloudflare Pages でワイルドカードのカスタムドメインはサポート外
+  - [https://developers.cloudflare.com/dns/manage-dns-records/reference/wildcard-dns-records/#create-a-wildcard-record](https://developers.cloudflare.com/dns/manage-dns-records/reference/wildcard-dns-records/#create-a-wildcard-record)
+- Netlify から Cloudflare Pages に引っ越しました
+  - [https://developers.cloudflare.com/dns/manage-dns-records/reference/wildcard-dns-records/#create-a-wildcard-record](https://developers.cloudflare.com/dns/manage-dns-records/reference/wildcard-dns-records/#create-a-wildcard-record)
+- GitHub Actions を使った Cloudflare Pages へのデプロイ
+  - [https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration](https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/)
+- working-directory を指定しても、root に package-lock.json が無いとエラー
+  - [https://zenn.dev/nixieminton/articles/8b26a92feb26d8](https://zenn.dev/nixieminton/articles/8b26a92feb26d8)
+- Remix + Cloudflare で Web サイトを作る
+  - [https://zenn.dev/saneatsu/scraps/e8071db160e004](https://zenn.dev/saneatsu/scraps/e8071db160e004)
+- Cloudflare Pages のドメインにアクセス制限をかける
+  - [https://dev.classmethod.jp/articles/cloudflare-pages-access](https://dev.classmethod.jp/articles/cloudflare-pages-access)
