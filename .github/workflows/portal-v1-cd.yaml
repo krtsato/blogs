@@ -10,8 +10,8 @@ on:
       - '!portal-v1/**.md'
 
 jobs:
-  deploy:
-    name: Deploy to Cloudflare Pages
+  deploy-prd:
+    name: Deploy Prd
     runs-on: ubuntu-latest
     defaults:
       run:
