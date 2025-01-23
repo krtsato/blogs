@@ -20,4 +20,9 @@ export default defineConfig({
     remix(),
     tsconfigPaths(),
   ],
+  resolve: {
+    alias: {
+      crypto: 'crypto-js',
+    },
+  }
 })

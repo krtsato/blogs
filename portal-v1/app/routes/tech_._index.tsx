@@ -1,11 +1,9 @@
 import { json } from "@remix-run/cloudflare"
 import { useLoaderData } from "@remix-run/react"
-
 import { listTechPosts } from "~/.server/posts/tech"
 import { PostHeadline } from "~/components/posts/headline"
 
 export const loader = async () => {
-  
   const posts = await listTechPosts().catch((err) => {
     console.error(`failed to list posts: err = ${err.message}`)
     throw err
