@@ -1,0 +1,23 @@
+{
+  "name": "portal-v2",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev src/index.ts",
+    "build": "wrangler deploy --dry-run src/index.ts",
+    "lint": "eslint . --ext .ts",
+    "check": "tsc --noEmit",
+    "sync:prices": "node scripts/sync-prices.js"
+  },
+  "dependencies": {
+    "@googleapis/youtube": "30.1.0",
+    "hono": "^4.3.8",
+    "js-yaml": "4.1.1",
+    "stripe": "20.1.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240405.0",
+    "typescript": "^5.4.5",
+    "wrangler": "^3.40.0"
+  }
+}

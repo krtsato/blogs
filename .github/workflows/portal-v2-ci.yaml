@@ -1,0 +1,35 @@
+name: portal-v2 CI
+
+on:
+  pull_request:
+    paths:
+      - 'portal-v2/**'
+      - '.github/workflows/portal-v2-ci.yml'
+  push:
+    branches: [main, master]
+    paths:
+      - 'portal-v2/**'
+      - '.github/workflows/portal-v2-ci.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: portal-v2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: portal-v2/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run check

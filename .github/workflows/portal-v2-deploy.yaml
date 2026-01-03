@@ -1,0 +1,41 @@
+name: portal-v2 deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: portal-v2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: portal-v2/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run check
+
+      - name: Sync Stripe prices (DRY_RUN)
+        run: npm run sync:prices
+        env:
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          DRY_RUN: "true"
+
+      - name: Dry-run deploy (wrangler)
+        run: npm run build
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          # 本番デプロイに切り替える場合は wrangler.toml の project 名を設定し、以下のコメントアウトを解除する
+          # WRANGLER_DEPLOY: "true"

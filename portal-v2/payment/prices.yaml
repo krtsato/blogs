@@ -1,0 +1,12 @@
+# サンプル: Article 単発価格定義
+# items:
+#   - articleSlug: "hello-world"
+#     currency: "JPY"
+#     amount: 980
+#     unit: "¥"
+#     name: "Hello World 単品"
+#   - articleSlug: "hello-world"
+#     currency: "USD"
+#     amount: 6.4
+#     unit: "$"
+#     name: "Hello World Single"
