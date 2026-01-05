@@ -3,7 +3,9 @@
 - ローカル実行: `npm install` → `npm run dev` (wrangler dev)
 - 型チェック: `npm run check`
 - 価格同期 (DRY_RUN): `npm run sync:prices`（`payment/prices.yaml` を編集）
+- 価格同期 (sandbox DRY_RUN): `npm run sync:prices:sandbox`
 - デプロイ CI: `.github/workflows/portal-v2-deploy.yaml` を手動実行（wrangler dry-run）
+- 価格同期 CI: `.github/workflows/portal-v2-stripe-pricing.yaml` を手動実行（DRY_RUNで live/sandbox 両方を確認）
 - Terraform 雛形: `terraform/main.tf`（R2/KV の作成例。アカウント ID やトークンを適宜設定）
 
 主なバインディング（wrangler/環境変数）
@@ -12,6 +14,7 @@
 - R2: `R2_ATTACHMENTS`
 - KV: `REACTIONS_KV`, `NOWPLAYING_KV`
 - Stripe: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
+- Stripe sandbox: `STRIPE_TEST_SECRET_KEY` または `STRIPE_SECRET_KEY_SANDBOX`（`STRIPE_MODE=sandbox` で同期）
 - Mail: `RESEND_API_KEY`
 - Slack: `SLACK_SIGNING_SECRET`
 - Vectorize: `VECTORIZE_INDEX`, `VECTORIZE_API_TOKEN`

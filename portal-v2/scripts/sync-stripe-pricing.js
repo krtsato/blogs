@@ -39,8 +39,8 @@ function assertPriceItem(item) {
   }
 }
 
-function logPlan(items) {
-  console.log('Plan (DRY_RUN=true):');
+function logPlan(items, mode, dryRun) {
+  console.log(`Plan (mode=${mode}, DRY_RUN=${dryRun}):`);
   items.forEach((item) => {
     console.log(
       `- product=article:${item.articleSlug} currency=${item.currency} amount=${item.amount} unit=${item.unit ?? ''}`
@@ -53,15 +53,20 @@ async function main() {
   const items = cfg.items ?? [];
   items.forEach(assertPriceItem);
 
-  const stripeKey = process.env.STRIPE_SECRET_KEY;
+  const mode = (process.env.STRIPE_MODE ?? 'live').toLowerCase();
+  const stripeKey =
+    mode === 'sandbox'
+      ? process.env.STRIPE_TEST_SECRET_KEY || process.env.STRIPE_SECRET_KEY_SANDBOX
+      : process.env.STRIPE_SECRET_KEY;
   const dryRun = process.env.DRY_RUN !== 'false';
 
   if (!stripeKey || dryRun) {
-    logPlan(items);
-    if (!stripeKey) console.warn('STRIPE_SECRET_KEY is not set. Skipping Stripe calls.');
+    logPlan(items, mode, dryRun);
+    if (!stripeKey) console.warn(`STRIPE key is not set for mode=${mode}. Skipping Stripe calls.`);
     return;
   }
 
+  console.log(`Syncing prices to Stripe mode=${mode}, DRY_RUN=${dryRun}`);
   const stripe = new Stripe(stripeKey, { apiVersion: '2024-06-20' });
   for (const item of items) {
     const product = await stripe.products.create({
