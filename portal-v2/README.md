@@ -2,7 +2,7 @@
 
 - ローカル実行: `npm install` → `npm run dev` (wrangler dev)
 - 型チェック: `npm run check`
-- 価格同期 (DRY_RUN): `npm run sync:prices`（`payment/prices.yaml` を編集）
+- 価格同期 (DRY_RUN): `npm run sync:prices`（`scripts/sync-stripe-pricing.js` 内の PRICES を編集）
 - 価格同期 (sandbox DRY_RUN): `npm run sync:prices:sandbox`
 - デプロイ CI: `.github/workflows/portal-v2-deploy.yaml` を手動実行（wrangler dry-run）
 - 価格同期 CI: `.github/workflows/portal-v2-stripe-pricing.yaml` を手動実行（DRY_RUNで live/sandbox 両方を確認）

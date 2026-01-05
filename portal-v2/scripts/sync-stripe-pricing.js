@@ -1,37 +1,16 @@
-// 価格定義ファイルを読み込み、Stripe に同期するスクリプト（DRY_RUN デフォルト）。
-// 定義ファイル: portal-v2/payment/prices.yaml または prices.json
+// 価格定義をこのファイル内で完結させ、Stripe に同期するスクリプト（DRY_RUN デフォルト）。
 // 期待構造: { items: [ { articleSlug, currency, amount, unit, name? } ] }
-
-import fs from 'node:fs';
-import path from 'node:path';
 import process from 'node:process';
 import Stripe from 'stripe';
-import { fileURLToPath } from 'node:url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const rootDir = path.join(__dirname, '..');
-const priceFileYaml = path.join(rootDir, 'payment', 'prices.yaml');
-const priceFileJson = path.join(rootDir, 'payment', 'prices.json');
-
-function loadPrices() {
-  if (fs.existsSync(priceFileYaml)) {
-    const yaml = requireYaml();
-    const data = yaml.load(fs.readFileSync(priceFileYaml, 'utf-8'));
-    return data;
-  }
-  if (fs.existsSync(priceFileJson)) {
-    return JSON.parse(fs.readFileSync(priceFileJson, 'utf-8'));
-  }
-  throw new Error('price definition file not found (payment/prices.yaml or prices.json)');
-}
-
-function requireYaml() {
-  try {
-    return require('js-yaml');
-  } catch (e) {
-    throw new Error('Install js-yaml to read YAML files: npm i -D js-yaml');
-  }
-}
+// TODO: 実際の価格をここに定義してください
+const PRICES = {
+  items: [
+    // 例:
+    // { articleSlug: 'hello-world', currency: 'JPY', amount: 980, unit: '¥', name: 'Hello World 単品' },
+    // { articleSlug: 'hello-world', currency: 'USD', amount: 6.4, unit: '$', name: 'Hello World Single' },
+  ]
+};
 
 function assertPriceItem(item) {
   if (!item.articleSlug || !item.currency || typeof item.amount !== 'number') {
@@ -49,8 +28,7 @@ function logPlan(items, mode, dryRun) {
 }
 
 async function main() {
-  const cfg = loadPrices();
-  const items = cfg.items ?? [];
+  const items = PRICES.items ?? [];
   items.forEach(assertPriceItem);
 
   const mode = (process.env.STRIPE_MODE ?? 'live').toLowerCase();
