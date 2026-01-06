@@ -27,4 +27,4 @@ Cron（wrangler の schedule で実行）
 
 ## TODO / 残課題
 
-- Terraform: D1/Vectorize/Pages Bindings を tf に追加し、tfvars で ID/キーを管理
+- Terraform: Pages Functions のバインディング（R2/KV/D1/Vectorize）を tf で定義し、`terraform.tfvars` に ID/キーを整理して適用できる形にする
