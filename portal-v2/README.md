@@ -6,7 +6,7 @@
 - 価格同期 (sandbox DRY_RUN): `npm run sync:prices:sandbox`
 - デプロイ CI: `.github/workflows/portal-v2-cd.yaml` を手動実行（wrangler dry-run）
 - 価格同期 CI: `.github/workflows/portal-v2-stripe-pricing.yaml` を手動実行（DRY_RUNで live/sandbox 両方を確認）
-- Terraform 雛形: `terraform/main.tf`（R2/KV の作成例。アカウント ID やトークンを適宜設定）
+- Terraform 雛形: `terraform/main.tf`（R2/KV/D1/Vectorize/Pages バインディング付き。`terraform.tfvars.example` をコピーして値を設定）
 
 主なバインディング（wrangler/環境変数）
 
@@ -27,4 +27,4 @@ Cron（wrangler の schedule で実行）
 
 ## TODO / 残課題
 
-- Terraform: Pages Functions のバインディング（R2/KV/D1/Vectorize）を tf で定義し、`terraform.tfvars` に ID/キーを整理して適用できる形にする
+- 特になし（Terraform バインディングまで設定済み。必要に応じて tfvars を実環境値に差し替えて apply）
