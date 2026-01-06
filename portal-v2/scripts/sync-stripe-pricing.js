@@ -46,6 +46,7 @@ async function main() {
   logPlan(items, mode, dryRun);
   if (!stripeKey || dryRun) {
     if (!stripeKey) console.warn(`STRIPE key is not set for mode=${mode}. Skipping Stripe calls.`);
+    if (dryRun) console.log('DRY_RUN is true; skipping Stripe API calls.');
     return;
   }
 
