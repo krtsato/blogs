@@ -46,7 +46,7 @@ Article/Chat の検索仕様を定義します。Article 本文は Vectorize に
 
 | Method/Path       | Query/Body                                                                                                                                                                                        | Response `data`                                 | Notes                                                                                                   |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| GET `/api/search` | `query`, `kinds=article,chat` (カンマ区切りで対象指定), `modes=semantic,lexical` (カンマ区切りで検索方式。例: Article は `semantic`, Chat は `lexical` を指定), `offset` (default 0), `limit`<=20 | `{ items: SearchHit[], offset, limit, total? }` | `modes` に `hybrid`/`all` は使わない。semantic: Vectorize (Article)、lexical: D1 FTS (Articleメタ/Chat) |
+| GET `/api/search` | `query`, `kinds=article,chat` (カンマ区切りで対象指定), `modes=semantic,lexical` (カンマ区切りで検索方式。例: Article は `semantic`, Chat は `lexical` を指定), `offset` (default 0), `limit`<=20 | `{ items: SearchHit[], offset, limit, total? }` | `modes` に `hybrid`/`all` は使わない。semantic: Vectorize (Article)、lexical: D1 FTS (Articleメタ/Chat)。Article の semantic/lexical 重複は slug 単位でマージしメタを補完。 |
 
 `SearchHit` 例:
 

@@ -30,6 +30,5 @@ Cron（wrangler の schedule で実行）
 - Payment: 本番用価格定義を作成し、`DRY_RUN=false` で sync 実行するフローの追加
 - Chat: 画像リサイズ/圧縮パイプライン（別ワーカー or クライアント前処理）、Turnstile/レートリミット
 - Reaction: snapshot バッチの対象期間/頻度の調整、異常検知/監視を追加
-- Search: semantic/lexical ヒットの重複マージは実装済み。Vectorize 障害時のフォールバック詳細化は要検討
 - NowPlaying: nextPageToken/ETag 管理の運用確認、二重取得防止のさらなる強化、KV キャッシュ無効化戦略のチューニング
 - Terraform: D1/Vectorize/Workers Pages のバインディング追加、tfvars 整備
