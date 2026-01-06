@@ -38,8 +38,13 @@ async function main() {
       : process.env.STRIPE_SECRET_KEY;
   const dryRun = process.env.DRY_RUN !== 'false';
 
+  if (items.length === 0) {
+    console.warn('PRICES.items is empty. Define prices before running this script.');
+    return;
+  }
+
+  logPlan(items, mode, dryRun);
   if (!stripeKey || dryRun) {
-    logPlan(items, mode, dryRun);
     if (!stripeKey) console.warn(`STRIPE key is not set for mode=${mode}. Skipping Stripe calls.`);
     return;
   }
