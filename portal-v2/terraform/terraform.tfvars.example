@@ -1,0 +1,10 @@
+cloudflare_api_token     = "cf_api_token_here"
+account_id               = "cf_account_id"
+r2_bucket_attachments    = "portal-v2-attachments"
+kv_reactions             = "portal-v2-reactions"
+kv_nowplaying            = "portal-v2-nowplaying"
+d1_database_name         = "portal_v2"
+vectorize_index_name     = "portal-v2-semantic"
+pages_project_name       = "portal-v2"
+# optional: set if you want Pages env var injection for Vectorize token
+# VECTORIZE_API_TOKEN is set inline in main.tf env_vars; override via tfvars if desired

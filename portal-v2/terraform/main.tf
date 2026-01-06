@@ -49,6 +49,11 @@ variable "vectorize_index_name" {
   description = "Vectorize index name (for search semantic index)"
 }
 
+variable "pages_project_name" {
+  type        = string
+  description = "Cloudflare Pages project name for portal-v2"
+}
+
 # R2 バケット (添付ファイル)
 resource "cloudflare_r2_bucket" "attachments" {
   account_id = var.account_id
@@ -81,10 +86,50 @@ resource "cloudflare_vectorize_index" "semantic" {
   metric      = "cosine"
 }
 
+resource "cloudflare_pages_project" "portal_v2" {
+  account_id = var.account_id
+  name       = var.pages_project_name
+
+  deployment_configs {
+    production {
+      r2_buckets = [
+        {
+          name        = "R2_ATTACHMENTS"
+          bucket_name = cloudflare_r2_bucket.attachments.name
+        }
+      ]
+      kv_namespaces = [
+        {
+          binding       = "REACTIONS_KV"
+          namespace_id  = cloudflare_workers_kv_namespace.reactions.id
+        },
+        {
+          binding       = "NOWPLAYING_KV"
+          namespace_id  = cloudflare_workers_kv_namespace.nowplaying.id
+        }
+      ]
+      d1_databases = [
+        {
+          binding      = "DB"
+          database_id  = cloudflare_d1_database.portal.id
+        }
+      ]
+      env_vars = {
+        VECTORIZE_INDEX      = { value = cloudflare_vectorize_index.semantic.id }
+        VECTORIZE_API_TOKEN  = { value = "" } # set via tfvars or workspace secrets
+      }
+    }
+  }
+}
+
 output "d1_database_id" {
   value = cloudflare_d1_database.portal.id
 }
 
 output "vectorize_index_id" {
   value = cloudflare_vectorize_index.semantic.id
+}
+
+output "pages_project_id" {
+  value = cloudflare_pages_project.portal_v2.id
 }
