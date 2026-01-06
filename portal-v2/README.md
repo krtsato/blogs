@@ -27,5 +27,4 @@ Cron（wrangler の schedule で実行）
 
 ## TODO / 残課題
 
-- NowPlaying: nextPageToken/ETag 永続化の運用確認と二重取得防止のテスト、KV キャッシュ無効化ポリシーの決定
 - Terraform: D1/Vectorize/Pages Bindings を tf に追加し、tfvars で ID/キーを管理
