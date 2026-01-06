@@ -4,6 +4,11 @@ import { Env } from '../env';
 import { listChats, insertChat, softDeleteChat, findChatBySlackEvent } from '../repositories/chat';
 import { verifySlackSignature } from '../utils/slack';
 import { ChatDetail, ChatSummary, AttachmentInput } from '../types/chat';
+import { detectImageMeta } from '../utils/image';
+import { checkRateLimit } from '../utils/rateLimit';
+import { KV_KEYS } from '../constants/kvKeys';
+import { verifyTurnstile } from '../utils/turnstile';
+import { decode as decodeImage, Image } from 'imagescript';
 
 export const chatRoutes = new Hono<{ Bindings: Env }>();
 
@@ -12,6 +17,7 @@ type CreateResponse = { data: { chat: ChatDetail } };
 type SlackResponse = { data: { ok: true; chat?: ChatDetail } };
 type DeleteResponse = { data: { deleted: true } };
 type AttachmentUploadResponse = { data: { path: string } };
+type CreatePayload = { body: string; nickname?: string; attachments?: AttachmentInput[]; turnstileToken?: string };
 
 const parseOffsetLimit = (query: (key: string) => string | undefined | null) => {
   const offset = Number(query('offset') ?? '0');
@@ -39,7 +45,18 @@ chatRoutes.get('/chat', async (c) => {
 });
 
 chatRoutes.post('/chat', async (c) => {
-  const body = await c.req.json<{ body: string; nickname?: string; attachments?: AttachmentInput[] }>();
+  const body = await c.req.json<CreatePayload>();
+  const fingerprint = getFingerprint(c);
+  const allowed = await checkRateLimit(
+    c.env.REACTIONS_KV,
+    fingerprint,
+    { limit: 10, windowSec: 60 },
+    KV_KEYS.chatRateLimit
+  );
+  if (!allowed) return c.json({ error: { code: 'rate_limit', message: 'too many requests' } }, 429);
+  const turnstileOk = await verifyTurnstile(body.turnstileToken, c.env.TURNSTILE_SECRET, fingerprint);
+  if (!turnstileOk) throw new HTTPException(400, { message: 'turnstile verification failed' });
+
   if (!body.body || body.body.length === 0 || body.body.length > 280) {
     throw new HTTPException(400, { message: 'body is required and must be <= 280 chars' });
   }
@@ -116,14 +133,44 @@ chatRoutes.post('/chat/attachments', async (c) => {
   const buf = await c.req.arrayBuffer();
   if (buf.byteLength > 2 * 1024 * 1024) throw new HTTPException(400, { message: 'image too large (max 2MB)' });
 
-  const id = crypto.randomUUID();
-  const ext = ct.includes('png') ? 'png' : ct.includes('webp') ? 'webp' : 'jpg';
-  const key = `chat/${id}.${ext}`;
+  const fingerprint = getFingerprint(c);
+  const ok = await checkRateLimit(
+    c.env.REACTIONS_KV,
+    fingerprint,
+    { limit: 5, windowSec: 60 },
+    KV_KEYS.chatRateLimit
+  );
+  if (!ok) return c.json({ error: { code: 'rate_limit', message: 'too many uploads' } }, 429);
 
-  await c.env.R2_ATTACHMENTS.put(key, buf, {
-    httpMetadata: { contentType: ct }
+  const meta = detectImageMeta(buf);
+  if (!meta) throw new HTTPException(400, { message: 'invalid image format' });
+
+  // サーバー側で最大 1920px に収め、品質 90% の WebP として再エンコードする
+  const decoded = await decodeImage(new Uint8Array(buf));
+  if (!(decoded instanceof Image)) {
+    throw new HTTPException(400, { message: 'animated image not supported' });
+  }
+  const maxSide = 1920;
+  if (decoded.width > maxSide || decoded.height > maxSide) {
+    const scale = Math.min(maxSide / decoded.width, maxSide / decoded.height);
+    decoded.resize(Math.round(decoded.width * scale), Math.round(decoded.height * scale));
+  }
+  const encoded = await decoded.encodeWEBP(90);
+  if (encoded.length > 2 * 1024 * 1024) {
+    throw new HTTPException(400, { message: 'image too large after encode (max 2MB)' });
+  }
+
+  const id = crypto.randomUUID();
+  const key = `chat/${id}.webp`;
+
+  await c.env.R2_ATTACHMENTS.put(key, encoded, {
+    httpMetadata: { contentType: 'image/webp' }
   });
 
-  // リサイズはアップロード時に実施すべきだが、Workers 単体では困難なため、アップロード前にクライアント/別ワーカーでの処理を想定
   return c.json<AttachmentUploadResponse>({ data: { path: `/${key}` } });
 });
+
+function getFingerprint(c: import('hono').Context<{ Bindings: Env }>) {
+  const ip = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For')?.split(',')[0]?.trim() || 'unknown';
+  return ip;
+}

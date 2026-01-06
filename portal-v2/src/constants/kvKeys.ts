@@ -5,5 +5,7 @@ export const KV_KEYS = {
   nowplayingEtag: 'nowplaying:etag',
   nowplayingList: (version: string | number, offset: number, limit: number) =>
     `nowplaying:list:v${version}:${offset}:${limit}`,
-  reactionRateLimit: (fingerprint: string) => `ratelimit:reaction:${fingerprint}`
+  reactionRateLimit: (fingerprint: string) => `ratelimit:reaction:${fingerprint}`,
+  chatRateLimit: (fingerprint: string) => `ratelimit:chat:${fingerprint}`,
+  reactionAnomalyLog: 'reaction:anomaly:last'
 } as const;

@@ -26,7 +26,9 @@ const reactionRateLimiter = async (c: any, next: any) => {
   const ua = c.req.header('User-Agent') ?? null;
   const ip = c.req.header('CF-Connecting-IP') ?? null;
   const fp = await makeFingerprint(c.env, ip, ua);
-  return createRateLimitMiddleware(c.env.REACTIONS_KV, RATE_LIMIT, async () => fp)(c, next);
+  return createRateLimitMiddleware(c.env.REACTIONS_KV, RATE_LIMIT, async () => fp, (fp2) =>
+    `ratelimit:reaction:${fp2}`
+  )(c, next);
 };
 
 function parseTarget(params: { targetKind: string; targetId: string }): ReactionTarget {

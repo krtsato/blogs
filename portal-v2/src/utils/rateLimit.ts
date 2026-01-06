@@ -6,9 +6,14 @@ export type RateLimitConfig = {
 };
 
 // シンプルな KV ベースの固定窓レートリミット
-export async function checkRateLimit(kv: KVNamespace | undefined, fingerprint: string, cfg: RateLimitConfig) {
-  if (!kv) return true; // KV がない場合はスキップ
-  const key = KV_KEYS.reactionRateLimit(fingerprint);
+export async function checkRateLimit(
+  kv: KVNamespace | undefined,
+  fingerprint: string,
+  cfg: RateLimitConfig,
+  keyBuilder?: (fp: string) => string
+) {
+  if (!kv || !keyBuilder) return true; // KV やキー生成がなければスキップ
+  const key = keyBuilder(fingerprint);
   const current = Number((await kv.get(key)) ?? '0');
   if (current >= cfg.limit) return false;
   await kv.put(key, String(current + 1), { expirationTtl: cfg.windowSec });
@@ -19,7 +24,8 @@ export async function checkRateLimit(kv: KVNamespace | undefined, fingerprint: s
 export function createRateLimitMiddleware<EnvBindings>(
   kv: KVNamespace | undefined,
   cfg: RateLimitConfig,
-  getFingerprint: (c: import('hono').Context<any, any, any>) => Promise<string | null>
+  getFingerprint: (c: import('hono').Context<any, any, any>) => Promise<string | null>,
+  keyBuilder: (fp: string) => string
 ) {
   return async (c: import('hono').Context<any, any, any>, next: import('hono').Next) => {
     const fp = await getFingerprint(c);
@@ -27,7 +33,7 @@ export function createRateLimitMiddleware<EnvBindings>(
       await next();
       return;
     }
-    const ok = await checkRateLimit(kv, fp, cfg);
+    const ok = await checkRateLimit(kv, fp, cfg, keyBuilder);
     if (!ok) {
       return c.json({ error: { code: 'rate_limit', message: 'too many requests' } }, 429);
     }

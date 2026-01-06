@@ -14,8 +14,35 @@
 - API: Hono (Pages Functions) で `/api/chat` を提供。Slack コマンド/イベントを受け取るエンドポイントを Workers/Functions 上に配置。
 - Slack 連携: Slash コマンド or Slack App の Incoming Webhook → API が `chats` に保存。管理者以外も Slack から投稿可能。
 - UI: Slack テイストのバブル。ニックネーム + アバター (オプション画像) + 本文 + タイムスタンプ + リアクション。Web フロントの投稿フォームから入力・送信可能。
-- 画像添付: Web は署名付き URL などで R2 に直接アップロードし、返却されたパスを API に送信。アップロード時に最大 2MB、かつ縦横最大 1920x1920px にリサイズして保存。
+- 画像添付: Web は API に直接 multipart/form-data で送信し、API サーバーが受信したバイナリを R2 バインディングで保存する。オブジェクトパスは API 側で `chat/{chatId}/{uuid}.{ext}` のように組み立て、Web リクエストにはパスを含めない。アップロード時に最大 2MB、かつ縦横最大 1920x1920px にリサイズして保存。
 - アバター: 一般ユーザーは固定のプレースホルダを表示。管理者のみ Pages 静的領域のアイコン画像を表示し、attachments とは別扱い。
+
+## 画像処理と保存方針
+
+- Web クライアントでアップロード前に圧縮し、品質は 90%、EXIF などのメタデータは削除してから API に送信する。圧縮後も 2MB 超ならアップロードを中止する。
+- リサイズはクライアント側で最大 1920x1920px に収める。ブラウザが対応する場合は WebP で保存し、未対応なら jpeg/png を使用。
+- R2 には圧縮済みの最終ファイルのみを保存し、`https://` を含まない相対パスを API が組み立てる。Web リクエストにはパスを含めず、配信時は Cloudflare CDN で長めのキャッシュを付与して帯域を抑える。署名付き URL は使わず、API サーバーが直接 R2 に `put` する。
+
+## 画像アップロード追加要件
+
+| 項目                      | 要件 / 挙動                                                                                        | 実施場所                  |
+| ------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------- |
+| 拡張子・MIME 制限         | jpeg/png/webp のみ許可。受信時に Content-Type/マジックナンバーを検証し、許可外は拒否。             | クライアント＋サーバー    |
+| サイズ・寸法制限          | 2MB 以下、最大 1920x1920px。クライアントで検証・リサイズし、サーバーでも検証して超過時は拒否。     | クライアント＋サーバー    |
+| NSFW/違法検知             | Cloudflare Images Moderation を利用予定。実装はコメントアウトで保留。`/* TODO: call moderation */` | サーバー (アップロード後) |
+| クライアント圧縮/リサイズ | アップロード前に品質 90%、EXIF 削除、リサイズ。サーバー側でも上限チェックを行う。                  | クライアント＋サーバー    |
+| 取り下げ時の扱い          | クライアントで添付を取り下げた場合はアップロードしないため R2 に残存しない。                       | クライアント              |
+
+補足: アップロード後の HEAD 再確認は行わず、API 受信時の MIME/サイズ制約に従わせる。Cloudflare Images Moderation 呼び出し部分はコメントで残す。
+
+## Turnstile コスト
+
+| 項目            | 内容                                                |
+| --------------- | --------------------------------------------------- |
+| プラン          | Cloudflare Turnstile Free                           |
+| 料金            | 無料（リクエスト数上限なし。追加課金なし）          |
+| 運用上の注意    | API/サイトごとにシークレットを管理し、失効時に更新  |
+| 参考時期        | 2025-02 時点の公開情報。料金変更時は見直しが必要    |
 
 ## D1 データモデル
 
@@ -56,13 +83,13 @@
 
 共通レスポンス: 成功 `{ data: ... }`, エラー `{ error: { code, message } }`。`Request-Id` を付与。
 
-| メソッド/パス                  | Query/Body                                                                  | Response `data`                                  | 備考                                                    |
-| ------------------------------ | --------------------------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------- |
-| GET `/api/chat`                | Query: `offset?` (default 0), `limit?` (default 20, max 50)                 | `{ items: ChatSummary[], offset, limit, total }` | `is_deleted=false` のみ。Edge cache 30s                 |
-| POST `/api/chat`               | Body `{ body: string, nickname?: string, attachments?: AttachmentInput[] }` | `{ chat: ChatDetail }`                           | Web投稿用。本文 280 文字以内、添付は画像のみ。R2 に保存 |
-| POST `/api/chat/slack`         | Slack 署名付きリクエスト (Slash コマンド/イベントの payload)                | `{ ok: true, chat?: ChatDetail }`                | Slack 用エンドポイント。署名検証必須                    |
-| DELETE `/api/chat/:id` (admin) | -                                                                           | `{ deleted: true }`                              | Cloudflare Access/Bearer。`is_deleted=true` にする      |
-| GET `/api/chat/:id` (optional) | -                                                                           | `{ chat: ChatDetail }`                           | 単体取得                                                |
+| メソッド/パス                  | Query/Body                                                                       | Response `data`                                  | 備考                                                    |
+| ------------------------------ | -------------------------------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------- |
+| GET `/api/chat`                | Query: `offset?` (default 0), `limit?` (default 20, max 50)                      | `{ items: ChatSummary[], offset, limit, total }` | `is_deleted=false` のみ。Edge cache 30s                 |
+| POST `/api/chat`               | Body `multipart/form-data` (fields: `body`, `nickname?`, files: `attachments[]`) | `{ chat: ChatDetail }`                           | Web投稿用。本文 280 文字以内、添付は画像のみ。R2 に保存 |
+| POST `/api/chat/slack`         | Slack 署名付きリクエスト (Slash コマンド/イベントの payload)                     | `{ ok: true, chat?: ChatDetail }`                | Slack 用エンドポイント。署名検証必須                    |
+| DELETE `/api/chat/:id` (admin) | -                                                                                | `{ deleted: true }`                              | Cloudflare Access/Bearer。`is_deleted=true` にする      |
+| GET `/api/chat/:id` (optional) | -                                                                                | `{ chat: ChatDetail }`                           | 単体取得                                                |
 
 レスポンス例:
 
@@ -138,8 +165,7 @@
 - TypeScript 例:
 
   ```ts
-  type Attachment = { type: "image"; path: string };
-  type AttachmentInput = { type: "image"; path: string }; // path は R2 の相対パス(`/r2/chat/...`)
+  type Attachment = { type: "image"; path: string }; // レスポンスは API が組み立てた R2 相対パス
   type ChatSummary = {
     id: string;
     body: string;
@@ -162,7 +188,7 @@
 ## バリデーション / モデレーション
 
 - 本文 280 文字以内、空文字不可。
-- 添付画像: 3 枚まで、各 2MB 以内。アップロード時に最大 1920x1920px へリサイズ。拡張子は jpeg/png/webp。パスに `https://` は含めず R2 の相対パスを送る。
+- 添付画像: 3 枚まで、各 2MB 以内。アップロード時に最大 1920x1920px へリサイズ。拡張子は jpeg/png/webp。パスは API が決定し、Web リクエストに含めない。
 - スパム対策: Cloudflare Turnstile (Web)、IP レートリミット (KV)。
 - 削除: 管理 API で `is_deleted=true`。フロントの一覧では非表示。
 
