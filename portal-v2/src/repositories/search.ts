@@ -5,6 +5,7 @@ const MAX_LIMIT = 20;
 
 type ArticleFTSRow = { slug: string; title: string; excerpt: string; published_at: number };
 type ChatFTSRow = { id: string; body: string; created_at: number };
+type ArticleHit = Extract<SearchHit, { type: 'article' }>;
 
 const parseKinds = (kinds: string | null): SearchKind[] => {
   if (!kinds) return ['article', 'chat'];
@@ -32,7 +33,7 @@ const parseOffsetLimit = (query: (key: string) => string | null) => {
 };
 
 // D1 FTS（article メタ）
-async function searchArticleFTS(db: D1Database, query: string, offset: number, limit: number): Promise<SearchHit[]> {
+async function searchArticleFTS(db: D1Database, query: string, offset: number, limit: number): Promise<ArticleHit[]> {
   const { results } = await db
     .prepare(
       `SELECT slug, title, excerpt, published_at
@@ -77,7 +78,7 @@ async function searchChatFTS(db: D1Database, query: string, offset: number, limi
 }
 
 // Vectorize semantic 検索（Article 本文）
-async function searchArticleVectorize(env: Env, query: string, limit: number): Promise<SearchHit[]> {
+async function searchArticleVectorize(env: Env, query: string, limit: number): Promise<ArticleHit[]> {
   // Cloudflare Vectorize API 呼び出し（簡易版: 直接 fetch）
   const res = await fetch(`https://api.cloudflare.com/client/v4/vectorize/indexes/${env.VECTORIZE_INDEX}/query`, {
     method: 'POST',
@@ -127,28 +128,36 @@ export async function searchAll(env: Env, q: string, kindsStr: string | null, mo
   const hits: SearchHit[] = [];
 
   // Article semantic
+  const articleMap = new Map<string, ArticleHit>(); // slug -> hit
   if (kinds.includes('article') && modes.includes('semantic')) {
     const semanticHits = await searchArticleVectorize(env, q, limit);
-    // メタを補完
-    const slugSet = Array.from(new Set(semanticHits.map((h) => (h as any).slug as string)));
+    const slugSet = Array.from(new Set(semanticHits.map((h) => h.slug)));
     const metaMap = await hydrateArticlesMeta(env.DB, slugSet);
     semanticHits.forEach((h) => {
-      if (h.type === 'article') {
-        const meta = metaMap[h.slug];
-        if (meta) {
-          h.title = meta.title;
-          h.excerpt = meta.excerpt;
-          h.publishedAt = meta.published_at;
-        }
+      const meta = metaMap[h.slug];
+      if (meta) {
+        h.title = meta.title;
+        h.excerpt = meta.excerpt;
+        h.publishedAt = meta.published_at;
       }
+      articleMap.set(h.slug, h);
     });
-    hits.push(...semanticHits);
   }
 
   // Article lexical
   if (kinds.includes('article') && modes.includes('lexical')) {
     const lexicalHits = await searchArticleFTS(env.DB, q, offset, limit);
-    hits.push(...lexicalHits);
+    lexicalHits.forEach((hit) => {
+      const existing = articleMap.get(hit.slug);
+      if (existing) {
+        // semantic に欠けるメタがあれば補完
+        if (!existing.title) existing.title = hit.title;
+        if (!existing.excerpt) existing.excerpt = hit.excerpt;
+        if (!existing.publishedAt) existing.publishedAt = hit.publishedAt;
+      } else {
+        articleMap.set(hit.slug, hit as ArticleHit);
+      }
+    });
   }
 
   // Chat lexical
@@ -157,7 +166,8 @@ export async function searchAll(env: Env, q: string, kindsStr: string | null, mo
     hits.push(...chatHits);
   }
 
-  // TODO: Article semantic と lexical の重複マージ/スコアリング
+  // Article の重複マージ結果を先頭に追加（semantic の順を優先）
+  hits.unshift(...Array.from(articleMap.values()));
 
   return { items: hits, offset, limit };
 }
