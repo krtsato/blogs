@@ -58,8 +58,8 @@ export async function insertNowplayingRows(
 ) {
   if (rows.length === 0) return;
   const now = Math.floor(Date.now() / 1000);
-  for (const r of rows) {
-    await db
+  const statements = rows.map((r) =>
+    db
       .prepare(
         `INSERT INTO nowplaying (id, video_id, title, artists, album, image_url, played_at, created_at, updated_at)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
@@ -75,6 +75,6 @@ export async function insertNowplayingRows(
         now,
         now
       )
-      .run();
-  }
+  );
+  await db.batch(statements);
 }
