@@ -39,6 +39,16 @@ variable "kv_nowplaying" {
   description = "KV namespace for nowplaying list cache"
 }
 
+variable "d1_database_name" {
+  type        = string
+  description = "D1 database name for portal-v2"
+}
+
+variable "vectorize_index_name" {
+  type        = string
+  description = "Vectorize index name (for search semantic index)"
+}
+
 # R2 バケット (添付ファイル)
 resource "cloudflare_r2_bucket" "attachments" {
   account_id = var.account_id
@@ -54,4 +64,27 @@ resource "cloudflare_workers_kv_namespace" "reactions" {
 resource "cloudflare_workers_kv_namespace" "nowplaying" {
   title      = var.kv_nowplaying
   account_id = var.account_id
+}
+
+# D1 データベース
+resource "cloudflare_d1_database" "portal" {
+  account_id = var.account_id
+  name       = var.d1_database_name
+}
+
+# Vectorize インデックス
+resource "cloudflare_vectorize_index" "semantic" {
+  account_id  = var.account_id
+  name        = var.vectorize_index_name
+  description = "portal-v2 semantic search index"
+  dimension   = 1536
+  metric      = "cosine"
+}
+
+output "d1_database_id" {
+  value = cloudflare_d1_database.portal.id
+}
+
+output "vectorize_index_id" {
+  value = cloudflare_vectorize_index.semantic.id
 }
